@@ -1,1 +1,0 @@
-export const BASE_URL = 'https://notes-ten-ruby.vercel.app';

@@ -1,24 +1,24 @@
 import React, { useState } from "react";
+import { useAuthentication, useGetNotes } from "../../libs";
+import { useAuthStore } from "../../store";
 import ProfileInfo from "../Cards/ProfileInfo";
-import { useNavigate } from "react-router-dom";
 import SearchBar from "../SearchBar/SearchBar";
 
-const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
+const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
+
+  const userInfo = useAuthStore((state) => state.user);
+  const { logout } = useAuthentication();
+  useGetNotes(searchQuery);
+
   const handleSearch = () => {
     if (searchQuery) {
-      onSearchNote(searchQuery);
+      //
     }
   };
   const onClearSearch = () => {
     setSearchQuery("");
     handleClearSearch();
-  };
-
-  const navigate = useNavigate();
-  const onLogout = () => {
-    localStorage.clear();
-    navigate("/login");
   };
 
   return (
@@ -35,7 +35,7 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
             handleSearch={handleSearch}
             onClearSearch={onClearSearch}
           />
-          <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
+          <ProfileInfo userInfo={userInfo} onLogout={logout} />
         </>
       ) : null}
     </div>

@@ -5,12 +5,14 @@ import { MdAdd } from "react-icons/md";
 import AddEditNotes from "./AddEditNotes";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "./../../utills/axiosInstance";
+import axiosInstance from "../../utils/axiosInstance";
 import moment from "moment";
 import Toast from "./../../components/ToastMessage/Toast";
 import EmptyCard from "../../components/EmptyCard/EmptyCard";
 import addNoteImg from "../../assets/images/Addnotesbro.svg";
 import noData from "../../assets/images/Nodata.svg";
+import { useAuthStore, useNotesStore } from "../../store";
+import { useGetNotes } from "../../libs";
 
 const Home = () => {
   const [openAddEditModal, setOpenAddEditModal] = useState({
@@ -25,13 +27,11 @@ const Home = () => {
     type: "add",
   });
 
-  const [allNotes, setAllNotes] = useState([]);
-  const [userInfo, setUserInfo] = useState(null);
+  const { mutate } = useGetNotes();
+  const userInfo = useAuthStore((state) => state.user);
+  const allNotes = useNotesStore((state) => state.notes ?? []);
 
   const [isSearch, setisSearch] = useState(false);
-
-  const navigate = useNavigate();
-
   const handleEdit = (noteDetails) => {
     setOpenAddEditModal({ isShow: true, data: noteDetails, type: "edit" });
   };
@@ -50,29 +50,6 @@ const Home = () => {
     });
   };
 
-  const getUserInfo = async () => {
-    try {
-      const response = await axiosInstance.get("/get-user");
-      if (response.data && response.data.user) {
-        setUserInfo(response.data.user);
-      }
-    } catch (error) {
-      if (error.response.status === 401) {
-        localStorage.clear();
-        navigate("/login");
-      }
-    }
-  };
-  //get all notes
-  const getAllNotes = async () => {
-    try {
-      const response = await axiosInstance.get("/get-all-notes");
-      if (response.data && response.data.notes) {
-        setAllNotes(response.data.notes);
-      }
-    } catch (error) {}
-  };
-
   //delete note
   const deleteNote = async (data) => {
     const noteId = data._id;
@@ -82,7 +59,7 @@ const Home = () => {
 
       if (response.data && !response.data.error) {
         showToastMessage("Note deleted successfully", "delete");
-        getAllNotes();
+        // getAllNotes();
       }
     } catch (error) {
       if (
@@ -92,22 +69,6 @@ const Home = () => {
       ) {
         console.log("an unexpected error occured please try again");
       }
-    }
-  };
-
-  //search for a notes
-  const onSearchNote = async (query) => {
-    try {
-      const response = await axiosInstance.get("/search-notes", {
-        params: { query },
-      });
-
-      if (response.data && response.data.notes) {
-        setisSearch(true);
-        setAllNotes(response.data.notes);
-      }
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -125,33 +86,18 @@ const Home = () => {
 
       if (response.data && response.data.note) {
         showToastMessage("note updated Successfully");
-        getAllNotes();
+        // getAllNotes();
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleClearSearch = () => {
-    setisSearch(false);
-    getAllNotes();
-  };
-
-  useEffect(() => {
-    getAllNotes();
-    getUserInfo();
-    return () => {};
-  }, []);
-
   return (
     <>
-      <Navbar
-        userInfo={userInfo}
-        onSearchNote={onSearchNote}
-        handleClearSearch={handleClearSearch}
-      />
+      <Navbar />
       <div className="container px-4 mx-auto">
-        {allNotes.length > 0 ? (
+        {allNotes?.length > 0 ? (
           <div className="grid grid-cols-3 gap-4 mt-8">
             {allNotes.map((item, index) => (
               <NoteCard
@@ -205,7 +151,7 @@ const Home = () => {
           onClose={() => {
             setOpenAddEditModal({ isShow: false, type: "add", data: null });
           }}
-          getAllNotes={getAllNotes}
+          getAllNotes={mutate}
           showToastMessage={showToastMessage}
         />
       </Modal>
