@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
   headers: {
-    "Contant-Type": "application/json",
+    "Content-Type": "application/json",
   },
 });
 

@@ -1,17 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import NoteCard from "../../components/Cards/NoteCard";
 import { MdAdd } from "react-icons/md";
 import AddEditNotes from "./AddEditNotes";
 import Modal from "react-modal";
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
-import moment from "moment";
 import Toast from "./../../components/ToastMessage/Toast";
 import EmptyCard from "../../components/EmptyCard/EmptyCard";
 import addNoteImg from "../../assets/images/Addnotesbro.svg";
 import noData from "../../assets/images/Nodata.svg";
-import { useAuthStore, useNotesStore } from "../../store";
+import { useNotesStore } from "../../store";
 import { useGetNotes } from "../../libs";
 
 const Home = () => {
@@ -28,10 +26,9 @@ const Home = () => {
   });
 
   const { mutate } = useGetNotes();
-  const userInfo = useAuthStore((state) => state.user);
   const allNotes = useNotesStore((state) => state.notes ?? []);
 
-  const [isSearch, setisSearch] = useState(false);
+  const [isSearch] = useState(false);
   const handleEdit = (noteDetails) => {
     setOpenAddEditModal({ isShow: true, data: noteDetails, type: "edit" });
   };
@@ -99,7 +96,7 @@ const Home = () => {
       <div className="container px-4 mx-auto">
         {allNotes?.length > 0 ? (
           <div className="grid grid-cols-3 gap-4 mt-8">
-            {allNotes.map((item, index) => (
+            {allNotes.map((item) => (
               <NoteCard
                 key={item._id}
                 title={item.title}

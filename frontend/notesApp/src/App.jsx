@@ -1,4 +1,3 @@
-import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Authenticated } from "./components/Authenticated";
 import Home from "./pages/Home/Home";

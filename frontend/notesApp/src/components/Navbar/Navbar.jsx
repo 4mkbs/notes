@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuthentication, useGetNotes } from "../../libs";
 import { useAuthStore } from "../../store";
 import ProfileInfo from "../Cards/ProfileInfo";
@@ -18,7 +18,6 @@ const Navbar = () => {
   };
   const onClearSearch = () => {
     setSearchQuery("");
-    handleClearSearch();
   };
 
   return (

@@ -13,7 +13,7 @@ export const Authenticated = ({ children, revert = false }) => {
     if (user) {
       setUser(user);
     }
-  }, [user]);
+  }, [user, setUser]);
 
   if (revert && accessToken) {
     return <Navigate to="/" />;

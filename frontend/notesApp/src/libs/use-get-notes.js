@@ -26,7 +26,7 @@ export const useGetNotes = (search = "") => {
     if (data) {
       setNotes(data.notes);
     }
-  }, [data]);
+  }, [data, setNotes]);
 
   return {
     data: data?.notes ?? [],
