@@ -1,5 +1,6 @@
 import { useAuthStore } from "../store";
 import axiosInstance from "../utils/axiosInstance";
+import { mutate as globalMutate } from "swr";
 
 export const useAuthentication = () => {
   const setUser = useAuthStore((state) => state.setUser);
@@ -17,8 +18,7 @@ export const useAuthentication = () => {
         setUser(response.data.user);
         return true;
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       return false;
     }
   };
@@ -36,8 +36,7 @@ export const useAuthentication = () => {
         setUser(response.data.user);
         return true;
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       return false;
     }
   };
@@ -45,6 +44,8 @@ export const useAuthentication = () => {
   const logout = () => {
     setAccessToken(null);
     setUser(null);
+    // Clear SWR cache for user and any dependent keys
+    globalMutate("user", null, { revalidate: false });
   };
 
   return { login, logout, register };

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNotesStore } from "../store";
+import { useAuthStore, useNotesStore } from "../store";
 import axiosInstance from "../utils/axiosInstance";
 import useSWR from "swr";
 
@@ -16,8 +16,10 @@ export const getNotes = async (search = "") => {
 };
 
 export const useGetNotes = (search = "") => {
-  const { data, error, isLoading, mutate } = useSWR(["notes", search], () =>
-    getNotes(search)
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const { data, error, isLoading, mutate } = useSWR(
+    accessToken ? ["notes", search] : null,
+    () => getNotes(search)
   );
 
   const setNotes = useNotesStore((state) => state.setNotes);

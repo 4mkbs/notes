@@ -56,7 +56,7 @@ const Home = () => {
 
       if (response.data && !response.data.error) {
         showToastMessage("Note deleted successfully", "delete");
-        // getAllNotes();
+        mutate(); // Refresh the notes list
       }
     } catch (error) {
       if (
@@ -83,7 +83,7 @@ const Home = () => {
 
       if (response.data && response.data.note) {
         showToastMessage("note updated Successfully");
-        // getAllNotes();
+        mutate(); // Refresh the notes list
       }
     } catch (error) {
       console.log(error);
@@ -91,11 +91,26 @@ const Home = () => {
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <Navbar />
-      <div className="container px-4 mx-auto">
+
+      <div className="container px-6 mx-auto py-8">
+        {/* Header Section */}
+        <div className="mb-8 animate-fade-in">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
+            My Notes
+          </h1>
+          <p className="text-gray-600">
+            {allNotes?.length > 0
+              ? `You have ${allNotes.length} note${
+                  allNotes.length > 1 ? "s" : ""
+                }`
+              : "Start creating your first note!"}
+          </p>
+        </div>
+
         {allNotes?.length > 0 ? (
-          <div className="grid grid-cols-3 gap-4 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
             {allNotes.map((item) => (
               <NoteCard
                 key={item._id}
@@ -111,46 +126,56 @@ const Home = () => {
             ))}
           </div>
         ) : (
-          <EmptyCard
-            imgSrc={isSearch ? noData : addNoteImg}
-            msg={
-              isSearch
-                ? `Oops! no data found!`
-                : `start creating your first note! Click the 'ADD' button to write down your thought and ideas!`
-            }
-          />
+          <div className="flex flex-col items-center justify-center py-20 animate-fade-in">
+            <EmptyCard
+              imgSrc={isSearch ? noData : addNoteImg}
+              msg={
+                isSearch
+                  ? `Oops! No notes found matching your search.`
+                  : `Start creating your first note! Click the '+' button to write down your thoughts and ideas!`
+              }
+            />
+          </div>
         )}
       </div>
 
+      {/* Floating Add Button */}
       <button
-        className="w-16 h-16 flex items-center justify-center rounded-2xl bg-primary hover:bg-blue-600 absolute right-10 bottom-10"
+        className="fixed right-8 bottom-8 w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-primary to-secondary text-white shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 z-50 group"
         onClick={() => {
           setOpenAddEditModal({ isShow: true, type: "add", data: null });
         }}
       >
-        <MdAdd className="text-[32px] text-white" />
+        <MdAdd className="text-3xl group-hover:rotate-90 transition-transform duration-300" />
       </button>
 
+      {/* Modal */}
       <Modal
         isOpen={openAddEditModal.isShow}
-        onRequestClose={() => {}} // close modal
+        onRequestClose={() => {
+          setOpenAddEditModal({ isShow: false, type: "add", data: null });
+        }}
         style={{
           overlay: {
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: "rgba(0, 0, 0, 0.75)",
+            backdropFilter: "blur(4px)",
+            zIndex: 1000,
           },
         }}
         contentLabel=""
-        className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-14 p-5 "
+        className="w-[95%] max-w-2xl mx-auto mt-20 outline-none"
       >
-        <AddEditNotes
-          type={openAddEditModal.type}
-          noteData={openAddEditModal.data}
-          onClose={() => {
-            setOpenAddEditModal({ isShow: false, type: "add", data: null });
-          }}
-          getAllNotes={mutate}
-          showToastMessage={showToastMessage}
-        />
+        <div className="glass rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto">
+          <AddEditNotes
+            type={openAddEditModal.type}
+            noteData={openAddEditModal.data}
+            onClose={() => {
+              setOpenAddEditModal({ isShow: false, type: "add", data: null });
+            }}
+            getAllNotes={mutate}
+            showToastMessage={showToastMessage}
+          />
+        </div>
       </Modal>
 
       <Toast
@@ -159,7 +184,7 @@ const Home = () => {
         type={showtoastMsg.type}
         onClose={handleCloseToast}
       />
-    </>
+    </div>
   );
 };
 

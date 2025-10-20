@@ -3,21 +3,21 @@ import { useAuthStore } from "../../store";
 
 const ProfileInfo = ({ onLogout }) => {
   const userInfo = useAuthStore((state) => state.user);
-  console.log(userInfo.user.fullName);
 
   return (
     <>
-      {userInfo ? (
+      {userInfo?.user ? (
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 flex items-center justify-center rounded-full text-slate-950 font-medium bg-slate-100 ">
+          <div className="w-12 h-12 flex items-center justify-center rounded-full text-white font-medium bg-gradient-to-r from-primary to-secondary shadow-lg">
             {getInitials(userInfo.user.fullName)}
           </div>
 
-          <div className="ml-2">
-            <p className="text-sm font-medium">{userInfo.user.fullName}</p>
-
+          <div>
+            <p className="text-sm font-semibold text-gray-800">
+              {userInfo.user.fullName}
+            </p>
             <button
-              className="text-sm text-slate-700 underline"
+              className="text-xs text-primary hover:text-secondary underline transition-colors duration-200"
               onClick={onLogout}
             >
               Logout

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import TagInput from "../../components/input/TagInput";
 import { MdClose } from "react-icons/md";
+import { FiSave, FiEdit } from "react-icons/fi";
 import axiosInstance from "../../utils/axiosInstance";
 
 const AddEditNotes = ({
@@ -74,7 +75,6 @@ const AddEditNotes = ({
       return;
     }
     setError("");
-    // console.log({ title, content, tags });
 
     if (type === "edit") {
       editNote();
@@ -85,48 +85,78 @@ const AddEditNotes = ({
 
   return (
     <div className="relative">
-      <button
-        className="w-10 h-10 rounded-full flex items-center justify-center absolute -top-3 -right-3 hover:bg-slate-500 "
-        onClick={onClose}
-      >
-        <MdClose className="text-xl text-gray-400" />
-      </button>
-      <div className="flex flex-col gap-2">
-        <label className="input-label">Title</label>
-        <input
-          type="text"
-          className="text-2xl text-slate-950 outline-none"
-          placeholder="write your title"
-          autoFocus={true}
-          value={title}
-          onChange={({ target }) => setTitle(target.value)}
-        />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
+            {type === "edit" ? (
+              <FiEdit className="text-white text-lg" />
+            ) : (
+              <FiSave className="text-white text-lg" />
+            )}
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            {type === "edit" ? "Edit Note" : "Create New Note"}
+          </h2>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors duration-200"
+        >
+          <MdClose className="text-xl text-gray-600" />
+        </button>
       </div>
 
-      <div className="flex flex-col gap-2 mt-4">
-        <label className="input-label">Content</label>
-        <textarea
-          type="text"
-          className="text-sm text-slate-950 outline-none bg-slate-50 p-2 rounded"
-          placeholder="write your note here"
-          rows={10}
-          value={content}
-          onChange={({ target }) => setContent(target.value)}
-        />
-      </div>
+      <div className="space-y-5">
+        <div>
+          <label className="input-label">Title</label>
+          <input
+            type="text"
+            className="w-full text-xl font-semibold text-gray-800 bg-gray-50 border-2 border-gray-200 px-5 py-3 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+            placeholder="Enter note title..."
+            autoFocus={true}
+            value={title}
+            onChange={({ target }) => setTitle(target.value)}
+          />
+        </div>
 
-      <div className="mt-3">
-        <label className="input-label">Tags</label>
-        <TagInput tags={tags} setTags={setTags} />
-      </div>
+        <div>
+          <label className="input-label">Content</label>
+          <textarea
+            className="w-full text-sm text-gray-700 bg-gray-50 border-2 border-gray-200 px-5 py-4 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none"
+            placeholder="Write your note here..."
+            rows={10}
+            value={content}
+            onChange={({ target }) => setContent(target.value)}
+          />
+        </div>
 
-      {error && <p className="text-red-500 text-xl pt-4">{error}</p>}
-      <button
-        className="btn-primary font-medium mt-5 p3"
-        onClick={handleAddNote}
-      >
-        {type === "edit" ? "Update" : "Add"}
-      </button>
+        <div>
+          <label className="input-label">Tags</label>
+          <TagInput tags={tags} setTags={setTags} />
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+            <p className="text-red-700 text-sm font-medium">{error}</p>
+          </div>
+        )}
+
+        <div className="flex gap-3 pt-4">
+          <button
+            onClick={handleAddNote}
+            className="flex-1 btn-primary flex items-center justify-center gap-2"
+          >
+            {type === "edit" ? <FiEdit /> : <FiSave />}
+            {type === "edit" ? "Update Note" : "Save Note"}
+          </button>
+          <button
+            onClick={onClose}
+            className="px-6 py-3 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors duration-200"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
