@@ -16,8 +16,10 @@ const AddEditNotes = ({
   const [tags, setTags] = useState(noteData?.tags || []);
 
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const addNote = async () => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post("/add-note", {
         title,
@@ -37,12 +39,14 @@ const AddEditNotes = ({
       ) {
         setError(error.response.data.message);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   const editNote = async () => {
     const noteId = noteData._id;
-
+    setLoading(true);
     try {
       const response = await axiosInstance.put("/edit-note/" + noteId, {
         title,
@@ -62,6 +66,8 @@ const AddEditNotes = ({
       ) {
         setError(error.response.data.message);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,11 +81,12 @@ const AddEditNotes = ({
       return;
     }
     setError("");
-
-    if (type === "edit") {
-      editNote();
-    } else {
-      addNote();
+    if (!loading) {
+      if (type === "edit") {
+        editNote();
+      } else {
+        addNote();
+      }
     }
   };
 
@@ -144,10 +151,23 @@ const AddEditNotes = ({
         <div className="flex gap-3 pt-4">
           <button
             onClick={handleAddNote}
-            className="flex-1 btn-primary flex items-center justify-center gap-2"
+            className="flex-1 btn-primary flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={loading}
           >
-            {type === "edit" ? <FiEdit /> : <FiSave />}
-            {type === "edit" ? "Update Note" : "Save Note"}
+            {loading ? (
+              <span className="animate-spin mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+            ) : type === "edit" ? (
+              <FiEdit />
+            ) : (
+              <FiSave />
+            )}
+            {loading
+              ? type === "edit"
+                ? "Updating..."
+                : "Saving..."
+              : type === "edit"
+              ? "Update Note"
+              : "Save Note"}
           </button>
           <button
             onClick={onClose}
