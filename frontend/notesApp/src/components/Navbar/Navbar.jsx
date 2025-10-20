@@ -23,14 +23,16 @@ const Navbar = () => {
 
   return (
     <nav className="glass sticky top-0 z-50 backdrop-blur-xl border-b border-white/20 shadow-soft">
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center gap-4">
+      <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {/* Left: Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
-              <FiBookOpen className="text-white text-xl" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
+              <FiBookOpen className="text-white text-base sm:text-xl" />
             </div>
-            <h2 className="text-2xl font-bold gradient-text">NotesApp</h2>
+            <h2 className="text-lg sm:text-2xl font-bold gradient-text hidden sm:block">
+              NotesApp
+            </h2>
           </div>
 
           {/* Center: Search */}
@@ -48,7 +50,7 @@ const Navbar = () => {
           </div>
 
           {/* Right: Profile */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 sm:gap-6">
             {userInfo ? (
               <ProfileInfo userInfo={userInfo} onLogout={logout} />
             ) : null}

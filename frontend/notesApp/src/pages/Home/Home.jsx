@@ -141,12 +141,12 @@ const Home = () => {
 
       {/* Floating Add Button */}
       <button
-        className="fixed right-8 bottom-8 w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-primary to-secondary text-white shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 z-50 group"
+        className="fixed right-4 bottom-4 sm:right-8 sm:bottom-8 w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-primary to-secondary text-white shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 z-50 group"
         onClick={() => {
           setOpenAddEditModal({ isShow: true, type: "add", data: null });
         }}
       >
-        <MdAdd className="text-3xl group-hover:rotate-90 transition-transform duration-300" />
+        <MdAdd className="text-2xl sm:text-3xl group-hover:rotate-90 transition-transform duration-300" />
       </button>
 
       {/* Modal */}

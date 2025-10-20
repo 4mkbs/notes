@@ -7,12 +7,12 @@ const ProfileInfo = ({ onLogout }) => {
   return (
     <>
       {userInfo?.user ? (
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 flex items-center justify-center rounded-full text-white font-medium bg-gradient-to-r from-primary to-secondary shadow-lg">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-white text-xs sm:text-base font-medium bg-gradient-to-r from-primary to-secondary shadow-lg">
             {getInitials(userInfo.user.fullName)}
           </div>
 
-          <div>
+          <div className="hidden sm:block">
             <p className="text-sm font-semibold text-gray-800">
               {userInfo.user.fullName}
             </p>
@@ -23,6 +23,14 @@ const ProfileInfo = ({ onLogout }) => {
               Logout
             </button>
           </div>
+
+          {/* Mobile: Show only avatar, tap to logout */}
+          <button
+            className="sm:hidden text-xs text-primary hover:text-secondary font-medium"
+            onClick={onLogout}
+          >
+            Logout
+          </button>
         </div>
       ) : null}
     </>
