@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import NoteCard from "../../components/Cards/NoteCard";
 import { MdAdd } from "react-icons/md";
@@ -25,10 +25,17 @@ const Home = () => {
     type: "add",
   });
 
-  const { mutate } = useGetNotes();
+  const searchQuery = useNotesStore((state) => state.searchQuery);
+  const [page, setPage] = useState(1);
+  const pageSize = 12;
+  const { mutate, pagination } = useGetNotes(searchQuery, page, pageSize);
   const allNotes = useNotesStore((state) => state.notes ?? []);
 
-  const [isSearch] = useState(false);
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery]);
+
+  const isSearch = useMemo(() => Boolean(searchQuery.trim()), [searchQuery]);
   const handleEdit = (noteDetails) => {
     setOpenAddEditModal({ isShow: true, data: noteDetails, type: "edit" });
   };
@@ -90,6 +97,8 @@ const Home = () => {
     }
   };
 
+  const hasMoreNotes = (pagination?.page ?? 1) < (pagination?.totalPages ?? 1);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <Navbar />
@@ -110,20 +119,33 @@ const Home = () => {
         </div>
 
         {allNotes?.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
-            {allNotes.map((item) => (
-              <NoteCard
-                key={item._id}
-                title={item.title}
-                date={item.createOn}
-                content={item.content}
-                tags={item.tags}
-                isPinned={item.isPinned}
-                onEdit={() => handleEdit(item)}
-                onDelete={() => deleteNote(item)}
-                onPinNote={() => updateIsPinned(item)}
-              />
-            ))}
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
+              {allNotes.map((item) => (
+                <NoteCard
+                  key={item._id}
+                  title={item.title}
+                  date={item.createOn}
+                  content={item.content}
+                  tags={item.tags}
+                  isPinned={item.isPinned}
+                  onEdit={() => handleEdit(item)}
+                  onDelete={() => deleteNote(item)}
+                  onPinNote={() => updateIsPinned(item)}
+                />
+              ))}
+            </div>
+
+            {hasMoreNotes && (
+              <div className="flex justify-center pb-8">
+                <button
+                  onClick={() => setPage((currentPage) => currentPage + 1)}
+                  className="px-6 py-3 rounded-xl bg-white border border-gray-200 text-gray-700 font-semibold shadow-sm hover:shadow-md hover:border-primary transition-all duration-200"
+                >
+                  Load more notes
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 animate-fade-in">

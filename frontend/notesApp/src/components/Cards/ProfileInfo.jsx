@@ -6,15 +6,15 @@ const ProfileInfo = ({ onLogout }) => {
 
   return (
     <>
-      {userInfo?.user ? (
+      {userInfo ? (
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="w-9 h-9 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-white text-xs sm:text-base font-medium bg-gradient-to-r from-primary to-secondary shadow-lg">
-            {getInitials(userInfo.user.fullName)}
+            {getInitials(userInfo.fullName)}
           </div>
 
           <div className="hidden sm:block">
             <p className="text-sm font-semibold text-gray-800">
-              {userInfo.user.fullName}
+              {userInfo.fullName}
             </p>
             <button
               className="text-xs text-primary hover:text-secondary underline transition-colors duration-200"

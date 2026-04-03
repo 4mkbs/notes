@@ -11,7 +11,7 @@ export const Authenticated = ({ children, revert = false }) => {
 
   useEffect(() => {
     if (user) {
-      setUser(user);
+      setUser(user?.user || user);
     }
   }, [user, setUser]);
 

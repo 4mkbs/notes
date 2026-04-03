@@ -4,7 +4,7 @@ import { IoMdClose } from "react-icons/io";
 const SearchBar = ({ value, onChange, handleSearch, onClearSearch }) => {
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      handleSearch();
+      handleSearch?.();
     } else if (e.target.value === "" && e.key === "Backspace") {
       onClearSearch();
     }
@@ -28,7 +28,7 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch }) => {
       )}
       <FaMagnifyingGlass
         className="text-sm sm:text-base text-slate-400 cursor-pointer hover:text-black flex-shrink-0"
-        onClick={handleSearch}
+        onClick={() => handleSearch?.()}
       />
     </div>
   );

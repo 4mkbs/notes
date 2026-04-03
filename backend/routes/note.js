@@ -3,6 +3,24 @@ const router = express.Router();
 const Note = require("../models/note.model");
 const { authenticateToken } = require("../utilities");
 
+const MAX_SEARCH_LENGTH = 100;
+const MAX_PAGE_SIZE = 100;
+
+const escapeRegex = (value = "") =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const normalizePagination = (page, limit) => {
+  const safePage = Math.max(1, Number.parseInt(page, 10) || 1);
+  const rawLimit = Number.parseInt(limit, 10) || 20;
+  const safeLimit = Math.min(Math.max(1, rawLimit), MAX_PAGE_SIZE);
+
+  return {
+    page: safePage,
+    limit: safeLimit,
+    skip: (safePage - 1) * safeLimit,
+  };
+};
+
 // Add note
 router.post("/add-note", authenticateToken, async (req, res) => {
   const { title, content, tags } = req.body;
@@ -33,7 +51,10 @@ router.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
   const noteId = req.params.noteId;
   const { title, content, tags, isPinned } = req.body;
   const { user } = req.user;
-  if (!title && !content && !tags && isPinned === undefined) {
+  const hasTitle = title !== undefined;
+  const hasContent = content !== undefined;
+  const hasTags = tags !== undefined;
+  if (!hasTitle && !hasContent && !hasTags && isPinned === undefined) {
     return res
       .status(400)
       .json({ error: true, message: "No changes provided" });
@@ -43,9 +64,9 @@ router.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
     if (!note) {
       return res.status(404).json({ error: true, message: "Note not found" });
     }
-    if (title) note.title = title;
-    if (content) note.content = content;
-    if (tags) note.tags = tags;
+    if (hasTitle) note.title = title;
+    if (hasContent) note.content = content;
+    if (hasTags) note.tags = tags;
     if (isPinned !== undefined) note.isPinned = isPinned;
     await note.save();
     return res.json({
@@ -63,24 +84,50 @@ router.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
 // Get all notes
 router.get("/get-all-notes", authenticateToken, async (req, res) => {
   const { user } = req.user;
-  const { search: query = "" } = req.query;
+  const { search: query = "", page = "1", limit = "20" } = req.query;
   try {
+    if (query.length > MAX_SEARCH_LENGTH) {
+      return res.status(400).json({
+        error: true,
+        message: `Search query cannot exceed ${MAX_SEARCH_LENGTH} characters`,
+      });
+    }
+
+    const {
+      page: safePage,
+      limit: safeLimit,
+      skip,
+    } = normalizePagination(page, limit);
+    const escapedQuery = escapeRegex(query);
     const searchFilter = query
       ? {
           userId: user._id,
           $or: [
-            { title: { $regex: new RegExp(query, "i") } },
-            { content: { $regex: new RegExp(query, "i") } },
+            { title: { $regex: escapedQuery, $options: "i" } },
+            { content: { $regex: escapedQuery, $options: "i" } },
           ],
         }
       : { userId: user._id };
-    const notes = await Note.find(searchFilter).sort({
-      isPinned: -1,
-      createOn: -1,
-    });
+    const [notes, total] = await Promise.all([
+      Note.find(searchFilter)
+        .sort({
+          isPinned: -1,
+          createOn: -1,
+        })
+        .skip(skip)
+        .limit(safeLimit),
+      Note.countDocuments(searchFilter),
+    ]);
+
     return res.json({
       error: false,
       notes,
+      pagination: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.ceil(total / safeLimit) || 1,
+      },
       message: "All notes retrieved successfully",
     });
   } catch (error) {
@@ -140,34 +187,5 @@ router.put(
     }
   }
 );
-
-// Search notes
-router.get("/search-notes", authenticateToken, async (req, res) => {
-  const { user } = req.user;
-  const { query } = req.query;
-  if (!query) {
-    return res
-      .status(400)
-      .json({ error: true, message: "Search query is required" });
-  }
-  try {
-    const matchingNotes = await Note.find({
-      userId: user._id,
-      $or: [
-        { title: { $regex: new RegExp(query, "i") } },
-        { content: { $regex: new RegExp(query, "i") } },
-      ],
-    }).sort({ isPinned: -1, createOn: -1 });
-    return res.json({
-      error: false,
-      notes: matchingNotes,
-      message: "Notes matching the search query retrieved successfully",
-    });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ error: true, message: "Internal server error" });
-  }
-});
 
 module.exports = router;

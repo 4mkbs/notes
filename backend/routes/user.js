@@ -2,8 +2,30 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const rateLimit = require("express-rate-limit");
 const User = require("../models/user.model");
 const { authenticateToken } = require("../utilities");
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: true, message: "Too many requests, please try again later" },
+});
+
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[ !"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~])[A-Za-z\d !"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~]{8,}$/;
+
+const accessTokenExpiry = process.env.ACCESS_TOKEN_EXPIRES_IN || "15m";
+
+const toTokenPayload = (user) => ({
+  user: {
+    _id: user._id,
+    email: user.email,
+    fullName: user.fullName,
+  },
+});
 
 // Health check
 router.get("/", (req, res) => {
@@ -11,17 +33,21 @@ router.get("/", (req, res) => {
 });
 
 // Register
-router.post("/create-account", async (req, res) => {
+router.post("/create-account", authLimiter, async (req, res) => {
   const { fullName, email, password } = req.body;
   if (!fullName || !email || !password) {
     return res
       .status(400)
       .json({ error: true, message: "All fields required" });
   }
-  if (password.length < 6) {
+  if (!passwordRegex.test(password)) {
     return res
       .status(400)
-      .json({ error: true, message: "Password must be at least 6 characters" });
+      .json({
+        error: true,
+        message:
+          "Password must be 8+ chars and include uppercase, lowercase, number, and special character",
+      });
   }
   try {
     const isUser = await User.findOne({ email });
@@ -33,8 +59,8 @@ router.post("/create-account", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ fullName, email, password: hashedPassword });
     await user.save();
-    const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "36000m",
+    const accessToken = jwt.sign(toTokenPayload(user), process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: accessTokenExpiry,
     });
     return res.json({
       error: false,
@@ -55,7 +81,7 @@ router.post("/create-account", async (req, res) => {
 });
 
 // Login
-router.post("/login", async (req, res) => {
+router.post("/login", authLimiter, async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res
@@ -66,18 +92,17 @@ router.post("/login", async (req, res) => {
     const userInfo = await User.findOne({ email });
     if (!userInfo) {
       return res
-        .status(400)
+        .status(401)
         .json({ error: true, message: "Invalid credentials" });
     }
     const isPasswordValid = await bcrypt.compare(password, userInfo.password);
     if (!isPasswordValid) {
       return res
-        .status(400)
+        .status(401)
         .json({ error: true, message: "Invalid credentials" });
     }
-    const user = { user: userInfo };
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "36000m",
+    const accessToken = jwt.sign(toTokenPayload(userInfo), process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: accessTokenExpiry,
     });
     return res.json({
       error: false,
@@ -99,20 +124,26 @@ router.post("/login", async (req, res) => {
 
 // Get user
 router.get("/get-user", authenticateToken, async (req, res) => {
-  const { user } = req.user;
-  const isUser = await User.findOne({ _id: user._id });
-  if (!isUser) {
-    return res.sendStatus(401);
+  try {
+    const { user } = req.user;
+    const isUser = await User.findOne({ _id: user._id });
+    if (!isUser) {
+      return res.sendStatus(401);
+    }
+    return res.json({
+      user: {
+        fullName: isUser.fullName,
+        email: isUser.email,
+        _id: isUser._id,
+        createdOn: isUser.createdOn,
+      },
+      message: "User found",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: true, message: "Internal server error" });
   }
-  return res.json({
-    user: {
-      fullName: isUser.fullName,
-      email: isUser.email,
-      _id: isUser._id,
-      createdOn: isUser.createdOn,
-    },
-    message: "User found",
-  });
 });
 
 module.exports = router;

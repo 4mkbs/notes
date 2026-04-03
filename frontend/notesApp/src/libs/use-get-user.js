@@ -4,7 +4,7 @@ import { useAuthStore } from "../store";
 
 export const getUser = async () => {
   const response = await axiosInstance.get("/get-user");
-  return response.data;
+  return response.data.user;
 };
 
 export const useGetUser = () => {

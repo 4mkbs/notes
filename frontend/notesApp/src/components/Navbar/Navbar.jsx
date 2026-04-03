@@ -1,22 +1,15 @@
-import { useState } from "react";
-import { useAuthentication, useGetNotes } from "../../libs";
-import { useAuthStore } from "../../store";
+import { useAuthentication } from "../../libs";
+import { useAuthStore, useNotesStore } from "../../store";
 import ProfileInfo from "../Cards/ProfileInfo";
 import SearchBar from "../SearchBar/SearchBar";
 import { FiBookOpen } from "react-icons/fi";
 
 const Navbar = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-
   const userInfo = useAuthStore((state) => state.user);
   const { logout } = useAuthentication();
-  useGetNotes(searchQuery);
+  const searchQuery = useNotesStore((state) => state.searchQuery);
+  const setSearchQuery = useNotesStore((state) => state.setSearchQuery);
 
-  const handleSearch = () => {
-    if (searchQuery) {
-      //
-    }
-  };
   const onClearSearch = () => {
     setSearchQuery("");
   };
@@ -43,7 +36,6 @@ const Navbar = () => {
                 onChange={({ target }) => {
                   setSearchQuery(target.value);
                 }}
-                handleSearch={handleSearch}
                 onClearSearch={onClearSearch}
               />
             ) : null}

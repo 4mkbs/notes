@@ -7,6 +7,9 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 export default [
   js.configs.recommended,
   {
+    ignores: ['dist/**', 'node_modules/**'],
+  },
+  {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2022,
@@ -18,6 +21,26 @@ export default [
         window: 'readonly',
         document: 'readonly',
         navigator: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        queueMicrotask: 'readonly',
+        performance: 'readonly',
+        matchMedia: 'readonly',
+        localStorage: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        FormData: 'readonly',
+        Blob: 'readonly',
+        AbortController: 'readonly',
+        fetch: 'readonly',
+        Request: 'readonly',
+        Response: 'readonly',
+        Headers: 'readonly',
+        DOMException: 'readonly',
+        IntersectionObserver: 'readonly',
+        requestAnimationFrame: 'readonly',
+        cancelAnimationFrame: 'readonly',
       },
     },
     plugins: {
@@ -31,6 +54,7 @@ export default [
       },
     },
     rules: {
+      'react/jsx-uses-vars': 'error',
       'react/jsx-no-target-blank': 'off',
       'react/prop-types': 'off',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
