@@ -14,7 +14,15 @@ export const useGetNotes = (search = "", page = 1, limit = 20) => {
   const accessToken = useAuthStore((state) => state.accessToken);
   const { data, error, isLoading, mutate } = useSWR(
     accessToken ? ["notes", search, page, limit] : null,
-    () => getNotes(search, page, limit)
+    () => getNotes(search, page, limit),
+    {
+      shouldRetryOnError: false,
+      onErrorRetry: (err) => {
+        if (err?.response?.status === 401) {
+          return;
+        }
+      },
+    }
   );
 
   const setNotes = useNotesStore((state) => state.setNotes);

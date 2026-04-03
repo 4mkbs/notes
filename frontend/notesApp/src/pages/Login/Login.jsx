@@ -47,8 +47,12 @@ const Login = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-2xl shadow-lg mb-4 transform hover:scale-110 transition-transform duration-300">
             <FiLogIn className="text-white text-3xl" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Welcome Back!</h1>
-          <p className="text-white/80">Sign in to continue to your notes</p>
+          <h1 className="text-4xl font-bold text-white dark:text-gray-100 mb-2">
+            Welcome Back!
+          </h1>
+          <p className="text-white/80 dark:text-gray-300">
+            Sign in to continue to your notes
+          </p>
         </div>
 
         {/* Login Card */}
@@ -57,7 +61,7 @@ const Login = () => {
             <div>
               <label className="input-label">Email Address</label>
               <div className="relative">
-                <FiMail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FiMail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                 <input
                   type="email"
                   placeholder="Enter your email"
@@ -93,10 +97,12 @@ const Login = () => {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
+              <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">New to Notes?</span>
+              <span className="px-4 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400">
+                New to Notes?
+              </span>
             </div>
           </div>
 

@@ -3,8 +3,12 @@ import { Authenticated } from "./components/Authenticated";
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
+import { useThemeStore } from "./store";
 
 const App = () => {
+  // Initialize theme state at app root so all pages respect current theme.
+  useThemeStore((state) => state.theme);
+
   return (
     <Routes>
       <Route

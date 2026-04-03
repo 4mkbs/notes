@@ -1,21 +1,23 @@
 import { useAuthentication } from "../../libs";
 import { useAuthStore, useNotesStore } from "../../store";
+import { useThemeStore } from "../../store";
 import ProfileInfo from "../Cards/ProfileInfo";
 import SearchBar from "../SearchBar/SearchBar";
-import { FiBookOpen } from "react-icons/fi";
+import { FiBookOpen, FiSun, FiMoon } from "react-icons/fi";
 
 const Navbar = () => {
   const userInfo = useAuthStore((state) => state.user);
   const { logout } = useAuthentication();
   const searchQuery = useNotesStore((state) => state.searchQuery);
   const setSearchQuery = useNotesStore((state) => state.setSearchQuery);
+  const { theme, toggleTheme } = useThemeStore();
 
   const onClearSearch = () => {
     setSearchQuery("");
   };
 
   return (
-    <nav className="glass sticky top-0 z-50 backdrop-blur-xl border-b border-white/20 shadow-soft">
+    <nav className="glass sticky top-0 z-50 backdrop-blur-xl border-b border-slate-200 dark:border-gray-700 shadow-soft">
       <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center gap-2 sm:gap-4">
           {/* Left: Logo */}
@@ -43,6 +45,19 @@ const Navbar = () => {
 
           {/* Right: Profile */}
           <div className="flex items-center gap-2 sm:gap-6">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 dark:hover:bg-gray-700 transition-colors duration-200"
+              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            >
+              {theme === "dark" ? (
+                <FiSun className="text-yellow-400 text-lg sm:text-xl" />
+              ) : (
+                <FiMoon className="text-slate-700 text-lg sm:text-xl" />
+              )}
+            </button>
+
             {userInfo ? (
               <ProfileInfo userInfo={userInfo} onLogout={logout} />
             ) : null}

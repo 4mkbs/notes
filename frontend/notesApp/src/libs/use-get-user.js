@@ -12,7 +12,15 @@ export const useGetUser = () => {
   // Only fetch when we have a token; otherwise skip to avoid 401 spam
   const { data, error, isLoading } = useSWR(
     accessToken ? "user" : null,
-    getUser
+    getUser,
+    {
+      shouldRetryOnError: false,
+      onErrorRetry: (err) => {
+        if (err?.response?.status === 401) {
+          return;
+        }
+      },
+    }
   );
 
   return {

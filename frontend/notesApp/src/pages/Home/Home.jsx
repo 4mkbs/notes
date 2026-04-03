@@ -40,6 +40,10 @@ const Home = () => {
     setOpenAddEditModal({ isShow: true, data: noteDetails, type: "edit" });
   };
 
+  const handleView = (noteDetails) => {
+    setOpenAddEditModal({ isShow: true, data: noteDetails, type: "view" });
+  };
+
   const showToastMessage = (message, type) => {
     setShowToastMsg({
       isShown: true,
@@ -100,7 +104,7 @@ const Home = () => {
   const hasMoreNotes = (pagination?.page ?? 1) < (pagination?.totalPages ?? 1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen transition-colors duration-300">
       <Navbar />
 
       <div className="container px-6 mx-auto py-8">
@@ -109,7 +113,7 @@ const Home = () => {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
             My Notes
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             {allNotes?.length > 0
               ? `You have ${allNotes.length} note${
                   allNotes.length > 1 ? "s" : ""
@@ -129,6 +133,7 @@ const Home = () => {
                   content={item.content}
                   tags={item.tags}
                   isPinned={item.isPinned}
+                  onView={() => handleView(item)}
                   onEdit={() => handleEdit(item)}
                   onDelete={() => deleteNote(item)}
                   onPinNote={() => updateIsPinned(item)}
@@ -140,7 +145,7 @@ const Home = () => {
               <div className="flex justify-center pb-8">
                 <button
                   onClick={() => setPage((currentPage) => currentPage + 1)}
-                  className="px-6 py-3 rounded-xl bg-white border border-gray-200 text-gray-700 font-semibold shadow-sm hover:shadow-md hover:border-primary transition-all duration-200"
+                  className="px-6 py-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-100 font-semibold shadow-sm hover:shadow-md hover:border-primary dark:hover:border-primary transition-all duration-200"
                 >
                   Load more notes
                 </button>
@@ -187,7 +192,7 @@ const Home = () => {
         contentLabel=""
         className="w-[95%] max-w-2xl mx-auto mt-20 outline-none"
       >
-        <div className="glass rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto">
+        <div className="glass rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto dark:bg-gray-900 dark:border-gray-700">
           <AddEditNotes
             type={openAddEditModal.type}
             noteData={openAddEditModal.data}

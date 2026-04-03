@@ -21,7 +21,7 @@ const Toast = ({ isShown, message, type, onClose }) => {
       }`}
     >
       <div
-        className={`min-w-80 bg-white border shadow-2xl rounded-xl overflow-hidden after:w-[5px] after:h-full ${
+        className={`min-w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-xl overflow-hidden after:w-[5px] after:h-full ${
           type === "delete" ? "after:bg-red-500" : "after:bg-green-500"
         } after:absolute after:left-0 after:top-0 after:rounded-l-xl`}
       >
@@ -38,7 +38,9 @@ const Toast = ({ isShown, message, type, onClose }) => {
             )}
           </div>
 
-          <p className="text-sm text-slate-800 font-medium">{message}</p>
+          <p className="text-sm text-slate-800 dark:text-gray-100 font-medium">
+            {message}
+          </p>
         </div>
       </div>
     </div>

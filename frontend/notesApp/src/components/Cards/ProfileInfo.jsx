@@ -13,7 +13,7 @@ const ProfileInfo = ({ onLogout }) => {
           </div>
 
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-gray-800">
+            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
               {userInfo.fullName}
             </p>
             <button

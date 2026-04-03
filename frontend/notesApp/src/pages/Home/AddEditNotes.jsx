@@ -17,6 +17,7 @@ const AddEditNotes = ({
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const isViewOnly = type === "view";
 
   const addNote = async () => {
     setLoading(true);
@@ -97,19 +98,25 @@ const AddEditNotes = ({
           <div className="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
             {type === "edit" ? (
               <FiEdit className="text-white text-lg" />
+            ) : type === "view" ? (
+              <FiEdit className="text-white text-lg" />
             ) : (
               <FiSave className="text-white text-lg" />
             )}
           </div>
-          <h2 className="text-2xl font-bold text-gray-800">
-            {type === "edit" ? "Edit Note" : "Create New Note"}
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            {type === "edit"
+              ? "Edit Note"
+              : type === "view"
+              ? "View Note"
+              : "Create New Note"}
           </h2>
         </div>
         <button
           onClick={onClose}
-          className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors duration-200"
+          className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center transition-colors duration-200"
         >
-          <MdClose className="text-xl text-gray-600" />
+          <MdClose className="text-xl text-gray-600 dark:text-gray-300" />
         </button>
       </div>
 
@@ -118,10 +125,11 @@ const AddEditNotes = ({
           <label className="input-label">Title</label>
           <input
             type="text"
-            className="w-full text-xl font-semibold text-gray-800 bg-gray-50 border-2 border-gray-200 px-5 py-3 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+            className="w-full text-xl font-semibold text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 px-5 py-3 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
             placeholder="Enter note title..."
             autoFocus={true}
             value={title}
+            readOnly={isViewOnly}
             onChange={({ target }) => setTitle(target.value)}
           />
         </div>
@@ -129,18 +137,37 @@ const AddEditNotes = ({
         <div>
           <label className="input-label">Content</label>
           <textarea
-            className="w-full text-sm text-gray-700 bg-gray-50 border-2 border-gray-200 px-5 py-4 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none"
+            className="w-full text-sm text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 px-5 py-4 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none"
             placeholder="Write your note here..."
             rows={10}
             value={content}
+            readOnly={isViewOnly}
             onChange={({ target }) => setContent(target.value)}
           />
         </div>
 
-        <div>
-          <label className="input-label">Tags</label>
-          <TagInput tags={tags} setTags={setTags} />
-        </div>
+        {!isViewOnly && (
+          <div>
+            <label className="input-label">Tags</label>
+            <TagInput tags={tags} setTags={setTags} />
+          </div>
+        )}
+
+        {isViewOnly && tags?.length > 0 && (
+          <div>
+            <label className="input-label">Tags</label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 dark:bg-primary/20 text-primary dark:text-blue-300"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
@@ -149,31 +176,33 @@ const AddEditNotes = ({
         )}
 
         <div className="flex gap-3 pt-4">
-          <button
-            onClick={handleAddNote}
-            className="flex-1 btn-primary flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-            disabled={loading}
-          >
-            {loading ? (
-              <span className="animate-spin mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
-            ) : type === "edit" ? (
-              <FiEdit />
-            ) : (
-              <FiSave />
-            )}
-            {loading
-              ? type === "edit"
-                ? "Updating..."
-                : "Saving..."
-              : type === "edit"
-              ? "Update Note"
-              : "Save Note"}
-          </button>
+          {!isViewOnly && (
+            <button
+              onClick={handleAddNote}
+              className="flex-1 btn-primary flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="animate-spin mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+              ) : type === "edit" ? (
+                <FiEdit />
+              ) : (
+                <FiSave />
+              )}
+              {loading
+                ? type === "edit"
+                  ? "Updating..."
+                  : "Saving..."
+                : type === "edit"
+                ? "Update Note"
+                : "Save Note"}
+            </button>
+          )}
           <button
             onClick={onClose}
-            className="px-6 py-3 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors duration-200"
+            className="px-6 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors duration-200"
           >
-            Cancel
+            {isViewOnly ? "Close" : "Cancel"}
           </button>
         </div>
       </div>

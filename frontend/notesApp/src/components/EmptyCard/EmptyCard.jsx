@@ -3,7 +3,7 @@ const EmptyCard = ({ imgSrc, msg }) => {
     <div className="flex flex-col items-center justify-center mt-20">
       <img src={imgSrc} alt="no notes" className="w-60" />
 
-      <p className="w-1/2 text-sm font-medium text-slate-700 text-center leading-7 mt-5">
+      <p className="w-1/2 text-sm font-medium text-slate-700 dark:text-gray-300 text-center leading-7 mt-5">
         {msg}
       </p>
     </div>
